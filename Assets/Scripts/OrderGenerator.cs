@@ -9,6 +9,13 @@ public class OrderGenerator : MonoBehaviour
 
     void Start()
     {
+        // Call the new method to generate and display an order on start
+        GenerateAndDisplayOrder();
+    }
+
+    // New method that generates an English order string
+    public string GenerateEnglishOrder()
+    {
         string item = GetRandomKey(AlienDictionary.ItemDict);
         string verb = GetRandomKey(AlienDictionary.VerbDict);
         string modifier = "";
@@ -19,8 +26,7 @@ public class OrderGenerator : MonoBehaviour
             List<string> validIngredients = AlienDictionary.ItemIngredients[item];
             ingredient = validIngredients[Random.Range(0, validIngredients.Count)];
 
-            // Optional: still allow modifiers only if you want!
-            modifier = ""; // You can skip modifiers for "Remove" or handle specially
+            modifier = ""; // Optional to skip modifiers for "Remove"
         }
         else
         {
@@ -32,7 +38,6 @@ public class OrderGenerator : MonoBehaviour
 
         if (verb == "Remove")
         {
-            // Skip the modifier when removing
             englishOrder = $"{item} {verb} {ingredient}";
         }
         else
@@ -40,6 +45,13 @@ public class OrderGenerator : MonoBehaviour
             englishOrder = $"{item} {verb} {modifier} {ingredient}";
         }
 
+        return englishOrder;
+    }
+
+    // Method to generate the order, translate it, display it, and log it
+    public void GenerateAndDisplayOrder()
+    {
+        string englishOrder = GenerateEnglishOrder();
         string alienOrder = AlienDictionary.TranslateOrder(englishOrder);
 
         orderText.text = alienOrder;
