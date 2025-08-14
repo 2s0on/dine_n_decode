@@ -18,8 +18,8 @@ public static class AlienDictionary
     {
         {"Add", "Zin"},
         {"Remove", "Droka"},
-        {"Double", "Reffo"},
-        {"Triple", "Trakka"}
+        //{"Double", "Reffo"},
+        //{"Triple", "Trakka"}
     };
 
     // dictionary for modifiers (flavors)
@@ -28,14 +28,14 @@ public static class AlienDictionary
         {"Spicy", "Krel"},
         {"Salty", "Nash"},
         {"Sweet", "Milu"},
-        {"Peppery", "Gorza"},
-        {"Tangy", "Zintal"}
+        //{"Peppery", "Gorza"},
+        //{"Tangy", "Zintal"}
     };
 
     // dictionary for ingredients
     public static Dictionary<string, string> IngredientDict = new Dictionary<string, string>()
     {
-        {"Bun", "Plor"},
+        {"Buns", "Plor"},
         {"Lettuce", "Frilka"},
         {"Patty", "Zeggo"},
         {"Cheese", "Molcha"},
@@ -50,7 +50,7 @@ public static class AlienDictionary
     // dictionary for the ingredients of the food items
     public static Dictionary<string, List<string>> ItemIngredients = new Dictionary<string, List<string>>()
     {
-        {"Burger", new List<string> { "Bun", "Patty", "Cheese", "Lettuce", "Tomato" } },
+        {"Burger", new List<string> { "Buns", "Patty", "Cheese", "Lettuce", "Tomato" } },
         {"Salad", new List<string> { "Lettuce", "Tomato", "Fruits" } },
         //{"Pasta", new List<string> { "Noodles", "Tomato", "Cheese", "Cream" } },
         //{"Soup", new List<string> { "Cream", "Mushroom" } },
@@ -58,9 +58,10 @@ public static class AlienDictionary
         {"Juice", new List<string> { "Fruits", "Ice" } }
     };
 
+
     public static string TranslateOrder(string order)
     {
-        string[] parts = order.ToLower().Split(' ', ','); // split into words on spaces and commas, also lowercases everything
+        string[] parts = order.Split(' ', ','); // split into words on spaces and commas, also lowercases everything
         List<string> translated = new List<string>(); // empty list to store alien words
 
         foreach (string rawWord in parts)
@@ -68,19 +69,19 @@ public static class AlienDictionary
             string word = rawWord.Trim(); // remove any extra punctuation/spaces
             if (string.IsNullOrEmpty(word)) continue;
 
-            if (ItemDict.TryGetValue(Capitalize(word), out string itemAlien)) // looks up the word from above dictionaries, then capitalizes first letter
+            if (ItemDict.TryGetValue(word, out string itemAlien))
             {
                 translated.Add(itemAlien); // adds to the list when found
             }
-            else if (VerbDict.TryGetValue(Capitalize(word), out string verbAlien))
+            else if (VerbDict.TryGetValue(word, out string verbAlien))
             {
                 translated.Add(verbAlien);
             }
-            else if (ModifierDict.TryGetValue(Capitalize(word), out string modAlien))
+            else if (ModifierDict.TryGetValue(word, out string modAlien))
             {
                 translated.Add(modAlien);
             }
-            else if (IngredientDict.TryGetValue(Capitalize(word), out string ingAlien))
+            else if (IngredientDict.TryGetValue(word, out string ingAlien))
             {
                 translated.Add(ingAlien);
             }
@@ -92,6 +93,7 @@ public static class AlienDictionary
 
         return string.Join(" ", translated); // joins all words with spaces to return a sentence
     }
+
 
     private static string Capitalize(string word) // capitalizes the first letter of the word 
     {

@@ -9,11 +9,11 @@ public class OrderGenerator : MonoBehaviour
 
     void Start()
     {
-        // Call the new method to generate and display an order on start
+        // call the new method to generate and display an order on start
         GenerateAndDisplayOrder();
     }
 
-    // New method that generates an English order string
+    // generate an english order string
     public string GenerateEnglishOrder()
     {
         string item = GetRandomKey(AlienDictionary.ItemDict);
@@ -26,7 +26,7 @@ public class OrderGenerator : MonoBehaviour
             List<string> validIngredients = AlienDictionary.ItemIngredients[item];
             ingredient = validIngredients[Random.Range(0, validIngredients.Count)];
 
-            modifier = ""; // Optional to skip modifiers for "Remove"
+            modifier = ""; // skips modifier for remove action
         }
         else
         {
@@ -48,7 +48,7 @@ public class OrderGenerator : MonoBehaviour
         return englishOrder;
     }
 
-    // Method to generate the order, translate it, display it, and log it
+    // generate the order, translate it, display it, and log it
     public void GenerateAndDisplayOrder()
     {
         string englishOrder = GenerateEnglishOrder();
@@ -59,6 +59,7 @@ public class OrderGenerator : MonoBehaviour
         Debug.Log("Alien: " + alienOrder);
     }
 
+    // calls on alien dictionary to get random keys to generate orders
     private string GetRandomKey(System.Collections.Generic.Dictionary<string, string> dict)
     {
         return dict.Keys.ElementAt(Random.Range(0, dict.Count));
