@@ -30,7 +30,7 @@ public class ServeZone : MonoBehaviour, IDropHandler
         }
         else
         {
-            Debug.LogWarning("Dropped item is not a plate or customer missing!"); 
+            Debug.LogWarning("Dropped item is not a plate or customer missing!");
         }
     }
 }

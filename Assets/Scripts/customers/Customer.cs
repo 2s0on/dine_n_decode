@@ -83,7 +83,7 @@ public class Customer : MonoBehaviour
         if (AlienDictionary.ItemIngredients.TryGetValue(item, out var baseList))
             result.AddRange(baseList);
 
-        // If there is no extra info beyond item+verb, we’re done
+        // If there is no extra info beyond item+verb, we're done
         if (words.Length < 3) return result;
 
         // Try to read optional modifier + ingredient at the end of the order.
@@ -91,7 +91,7 @@ public class Customer : MonoBehaviour
         //   "Item Add Ingredient"
         //   "Item Add Modifier Ingredient"
         //   "Item Remove Ingredient"
-        //   "Item Remove Modifier Ingredient"   (we’ll remove either the modded or the plain ingredient)
+        //   "Item Remove Modifier Ingredient"   (we'll remove either the modded or the plain ingredient)
         string ingredient = words[^1];                  // last word
         string maybeModifier = words.Length >= 4 ? words[^2] : null;
         bool hasModifier = !string.IsNullOrEmpty(maybeModifier) &&

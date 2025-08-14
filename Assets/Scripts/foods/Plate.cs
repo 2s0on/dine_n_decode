@@ -6,13 +6,13 @@ public class Plate : MonoBehaviour
     private List<string> ingredients = new List<string>();
     private string pendingModifier = null; // Store modifier until next ingredient
 
-
     // call this with a FoodItem so we can decide if it's a modifier or ingredient
     public void AddFood(FoodItem item)
     {
         if (item == null) return;
 
         if (item.type == FoodType.Modifier)
+
         {
             pendingModifier = item.itemName; // store modifier for next ingredient
             Debug.Log($"Pending modifier set: {pendingModifier}");
@@ -46,11 +46,7 @@ public class Plate : MonoBehaviour
     public List<string> GetIngredients()
     {
         return ingredients;
-    }
 
-    public void ClearPlate()
-    {
-        ingredients.Clear();
-        pendingModifier = null;
     }
 }
+
