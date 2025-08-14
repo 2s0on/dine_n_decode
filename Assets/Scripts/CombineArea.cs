@@ -1,91 +1,82 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class CombineArea : MonoBehaviour, IDropHandler
+public class CombineArea : MonoBehaviour
 {
     [Header("Plate Settings")]
-    public GameObject platePrefab;
-    public RectTransform plateSpawnPoint;
+    public GameObject platePrefab;        // Prefab reference (not actually used here, but might be used if you spawn plates dynamically)
+    public RectTransform plateSpawnPoint; // Position where a plate should appear (not used in current logic)
 
-    private GameObject currentPlateInArea;
+    private GameObject currentPlateInArea; // Stores the current plate in the combine area (null if none)
 
-    public void OnDrop(PointerEventData eventData)
+    /// <summary>
+    /// Called when the player drops an object onto this CombineArea.
+    /// The Draggable script should trigger this.
+    /// </summary>
+    public void HandleDrop(GameObject dropped)
     {
-        GameObject draggedObj = eventData.pointerDrag;
-        if (draggedObj == null) return;
+        // If nothing was dropped, do nothing.
+        if (dropped == null) return;
 
-        // plate logic
-        if (draggedObj.CompareTag("Plate"))
+        // ---------------------------
+        // CASE 1: Player dropped a Plate
+        // ---------------------------
+        if (dropped.CompareTag("Plate"))
         {
+            // If there’s already a plate here, don’t allow another one.
             if (currentPlateInArea != null)
             {
-                Debug.Log("Combine area already has a plate."); // prevents user from placing multiple plates
+                Debug.Log("Combine area already has a plate."); // Just a debug message
                 return;
             }
 
-            RectTransform droppedRect = draggedObj.GetComponent<RectTransform>();
-            droppedRect.SetParent(transform, false);
-            droppedRect.anchoredPosition = Vector2.zero; // snap plate to combine area
+            // Place the plate into this area
+            dropped.transform.SetParent(transform, false); // Set this combine area as the plate's parent
+            ((RectTransform)dropped.transform).anchoredPosition = Vector2.zero; // Position plate at the center of the area
 
-            currentPlateInArea = draggedObj;
+            // Keep track of which plate is here
+            currentPlateInArea = dropped;
+
             Debug.Log("Plate placed in combine area.");
-            return;
+            return; // Exit because we don't need to check food logic
         }
 
-        // ingredient & modifier logic
-        FoodItem foodItem = draggedObj.GetComponent<FoodItem>();
-        if (foodItem == null) // checks for FoodItem script
+        // ---------------------------
+        // CASE 2: Player dropped an Ingredient or Modifier
+        // ---------------------------
+
+        // Check if this object is a FoodItem (ingredient/modifier)
+        FoodItem foodItem = dropped.GetComponent<FoodItem>();
+        if (foodItem == null)
         {
             Debug.LogWarning("Dropped object has no FoodItem script!");
-            return;
+            return; // Can't do anything without FoodItem data
         }
 
-        if (currentPlateInArea == null) // checks if a plate exists in the combine area
+        // Check if we already have a plate to put the ingredient on
+        if (currentPlateInArea == null)
         {
             Debug.LogWarning("You need a plate in the combine area before adding ingredients!");
             return;
         }
 
-        // add the ingredient/modifier to the plate
+        // Add the ingredient/modifier to the plate's list
         Plate plateScript = currentPlateInArea.GetComponent<Plate>();
         if (plateScript != null)
         {
-            plateScript.AddIngredient(foodItem.itemName);
+            plateScript.AddFood(foodItem); // Updates the plate's stored data
         }
 
-        // snap ingredient onto plate
-        RectTransform ingredientRect = draggedObj.GetComponent<RectTransform>();
-        ingredientRect.SetParent(currentPlateInArea.transform, false);
-        ingredientRect.anchoredPosition = Vector2.zero;
+        // Visually move the ingredient onto the plate
+        dropped.transform.SetParent(currentPlateInArea.transform, false);
+        ((RectTransform)dropped.transform).anchoredPosition = Vector2.zero;
 
         Debug.Log($"{foodItem.itemName} placed on plate.");
-
-        // resets the draggable in original spot
-        Draggable draggable = draggedObj.GetComponent<Draggable>();
-        if (draggable != null && draggable.originalParent != null)
-        {
-            // instantiate a new ingredient at the original position
-            GameObject newIngredient = Instantiate(draggedObj.gameObject, draggable.originalParent);
-            RectTransform newRect = newIngredient.GetComponent<RectTransform>();
-            newRect.anchoredPosition = draggable.originalPosition;
-
-            // reset the draggable component (ensures that it can be dragged again)
-            Draggable newDraggable = newIngredient.GetComponent<Draggable>();
-            newDraggable.originalParent = draggable.originalParent;
-            newDraggable.originalPosition = draggable.originalPosition;
-
-            // reset the canvas group properties ensuring it can be interacted with
-            CanvasGroup cg = newIngredient.GetComponent<CanvasGroup>();
-            if (cg != null)
-            {
-                cg.alpha = 1f;
-                cg.blocksRaycasts = true;
-            }
-        }
     }
 
-    // clears the combine area, removing the current plate
-    // !! Not sure if this works !!
+    /// <summary>
+    /// Clears the plate reference so the area is ready for a new one.
+    /// Called when plate is removed or delivered.
+    /// </summary>
     public void ClearCombineArea()
     {
         currentPlateInArea = null;

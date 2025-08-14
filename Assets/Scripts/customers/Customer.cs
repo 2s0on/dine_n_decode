@@ -1,3 +1,4 @@
+using System; // Add this namespace for Action
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class Customer : MonoBehaviour
 
     public GameObject correctIconPrefab; // assign a green checkmark prefab
     public GameObject wrongIconPrefab;   // assign a red X prefab
+    public event Action onCustomerLeave;
 
     private bool isServed = false;
     private float patienceTimer;
@@ -23,7 +25,8 @@ public class Customer : MonoBehaviour
     {
         patienceTimer = patience;
 
-        orderGenerator = Object.FindFirstObjectByType<OrderGenerator>();
+        // Explicitly specify UnityEngine.Object to resolve ambiguity
+        orderGenerator = UnityEngine.Object.FindFirstObjectByType<OrderGenerator>();
         if (orderGenerator != null)
         {
             GenerateOrder();
@@ -43,9 +46,11 @@ public class Customer : MonoBehaviour
         if (patienceSlider != null)
             patienceSlider.value = patienceTimer / patience;
 
-        if (patienceTimer <= 0)
+        if (patienceTimer <= 0 && !isServed)
         {
+            isServed = true; // prevents multiple triggers
             Debug.Log("Customer left due to impatience!");
+            StartCoroutine(RemoveCustomerAfterDelay(0f)); // remove immediately
         }
     }
 
@@ -167,6 +172,7 @@ public class Customer : MonoBehaviour
     IEnumerator RemoveCustomerAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+        onCustomerLeave?.Invoke(); // notify spawner
         Destroy(gameObject);
     }
 }

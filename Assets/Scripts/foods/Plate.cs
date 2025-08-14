@@ -6,27 +6,42 @@ public class Plate : MonoBehaviour
     private List<string> ingredients = new List<string>();
     private string pendingModifier = null; // Store modifier until next ingredient
 
-    public void AddModifier(string modifier)
-    {
-        // Example: "Spicy", "Double", "Sweet"
-        pendingModifier = pendingModifier == null ? modifier : pendingModifier + " " + modifier;
-        Debug.Log($"Pending modifier: {pendingModifier}");
-    }
 
-    public void AddIngredient(string ingredient)
+    // call this with a FoodItem so we can decide if it's a modifier or ingredient
+    public void AddFood(FoodItem item)
     {
-        string finalName = ingredient;
+        if (item == null) return;
 
-        // If there's a pending modifier, combine it with this ingredient
-        if (!string.IsNullOrEmpty(pendingModifier))
+        if (item.type == FoodType.Modifier)
         {
-            finalName = pendingModifier + " " + ingredient;
-            pendingModifier = null; // Clear after using
+            pendingModifier = item.itemName; // store modifier for next ingredient
+            Debug.Log($"Pending modifier set: {pendingModifier}");
+            return;
         }
 
-        ingredients.Add(finalName);
-        Debug.Log($"Added to plate: {finalName}");
+        if (item.type == FoodType.Ingredient)
+        {
+            // Combine with modifier **once** here
+            string finalName = string.IsNullOrEmpty(pendingModifier)
+                ? item.itemName
+                : $"{pendingModifier} {item.itemName}";
+
+            ingredients.Add(finalName);
+            Debug.Log($"Added to plate: {finalName}");
+
+            pendingModifier = null; // clear after use
+        }
     }
+
+    // NOTE: MODIFIERS MUST COME BEFORE INGREDIENTS FOR THIS TO WORK
+
+    // Remove the modifier logic from AddIngredient entirely:
+    public void AddIngredient(string ingredient)
+    {
+        ingredients.Add(ingredient);
+        Debug.Log($"Added to plate: {ingredient}");
+    }
+
 
     public List<string> GetIngredients()
     {

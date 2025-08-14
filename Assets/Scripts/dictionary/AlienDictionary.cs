@@ -95,10 +95,10 @@ public static class AlienDictionary
     }
 
 
-    private static string Capitalize(string word) // capitalizes the first letter of the word 
-    {
-        if (string.IsNullOrEmpty(word)) return word;
-        return char.ToUpper(word[0]) + word.Substring(1);
-    }
+    //private static string Capitalize(string word) // capitalizes the first letter of the word 
+    //{
+    //    if (string.IsNullOrEmpty(word)) return word;
+    //    return char.ToUpper(word[0]) + word.Substring(1);
+    //}
 
 }
