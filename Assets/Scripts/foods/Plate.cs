@@ -6,6 +6,20 @@ public class Plate : MonoBehaviour
     private List<string> ingredients = new List<string>();
     private string pendingModifier = null; // Store modifier until next ingredient
 
+    //prevents plate from scaling when parented to a new object
+    private Vector3 originalLocalScale;
+
+    void Awake()
+    {
+        originalLocalScale = transform.localScale;
+    }
+
+    public void SetParentAndKeepScale(Transform newParent)
+    {
+        transform.SetParent(newParent);
+        transform.localScale = originalLocalScale;
+    }
+
     // call this with a FoodItem so we can decide if it's a modifier or ingredient
     public void AddFood(FoodItem item)
     {

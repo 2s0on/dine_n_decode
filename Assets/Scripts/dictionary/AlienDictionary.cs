@@ -25,11 +25,12 @@ public static class AlienDictionary
     // dictionary for modifiers (flavors)
     public static Dictionary<string, string> ModifierDict = new Dictionary<string, string>()
     {
-        {"Spicy", "Krel"},
+        {"Tangy", "Zintal"},
         {"Salty", "Nash"},
         {"Sweet", "Milu"},
+        //{"Spicy", "Krel"},
         //{"Peppery", "Gorza"},
-        //{"Tangy", "Zintal"}
+
     };
 
     // dictionary for ingredients
@@ -41,7 +42,7 @@ public static class AlienDictionary
         {"Cheese", "Molcha"},
         {"Tomato", "Rezzi"},
         //{"Cream", "Zugu" },
-        {"Fruits", "Noki" },
+        {"Apple", "Noki" },
         //{"Noodles", "Fuzza" },
         //{"Mushroom", "Gorlo" },
         {"Ice", "Zilto" }
@@ -51,11 +52,11 @@ public static class AlienDictionary
     public static Dictionary<string, List<string>> ItemIngredients = new Dictionary<string, List<string>>()
     {
         {"Burger", new List<string> { "Buns", "Patty", "Cheese", "Lettuce", "Tomato" } },
-        {"Salad", new List<string> { "Lettuce", "Tomato", "Fruits" } },
+        {"Salad", new List<string> { "Lettuce", "Tomato", "Apple" } },
         //{"Pasta", new List<string> { "Noodles", "Tomato", "Cheese", "Cream" } },
         //{"Soup", new List<string> { "Cream", "Mushroom" } },
         //{"Cake", new List<string> { "Cream", "Fruits" } },
-        {"Juice", new List<string> { "Fruits", "Ice" } }
+        {"Juice", new List<string> { "Apple", "Ice" } }
     };
 
 

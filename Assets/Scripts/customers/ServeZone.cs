@@ -6,6 +6,7 @@ public class ServeZone : MonoBehaviour, IDropHandler
     [Header("Customer linked to this zone")]
     public Customer customer; // assign via inspector
 
+
     public void OnDrop(PointerEventData eventData)
     {
         GameObject draggedObj = eventData.pointerDrag;
@@ -18,8 +19,9 @@ public class ServeZone : MonoBehaviour, IDropHandler
 
             // snap plate to zone visually
             RectTransform plateRect = draggedObj.GetComponent<RectTransform>();
-            plateRect.SetParent(transform, false);
+            plate.SetParentAndKeepScale(transform);
             plateRect.anchoredPosition = Vector2.zero;
+            // prevents plate from scaling when parented to this zone
 
             // disable dragging
             Draggable dragScript = draggedObj.GetComponent<Draggable>();
@@ -27,6 +29,11 @@ public class ServeZone : MonoBehaviour, IDropHandler
 
             // called for customer.cs to check plate
             customer.Serve(plate);
+            CombineArea combineArea = FindObjectOfType<CombineArea>();
+            if (combineArea != null)
+            {
+                combineArea.ResetCombineArea();
+            }
         }
         else
         {
