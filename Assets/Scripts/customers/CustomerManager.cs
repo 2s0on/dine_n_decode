@@ -4,21 +4,21 @@ using UnityEngine;
 public class CustomerManager : MonoBehaviour
 {
     [Header("Customer Settings")]
-    public GameObject customerPrefab; // customer prefab
-    public Transform[] spawnPoints;   // the points where customers can spawn
-    public int maxCustomers = 3;      // maximum number of customers allowed at once
+    public GameObject customerPrefab; // customer prefab to spawn
+    public Transform[] spawnPoints;   // positions where customers can appear
+    public int maxCustomers = 3;      // max number of customers at the same time
 
     [Header("Spawn Timing")]
-    public float minSpawnDelay = 1f;  // min max delay of customer spawn
-    public float maxSpawnDelay = 4f;  
+    public float minSpawnDelay = 1f;  // minimum delay between spawns
+    public float maxSpawnDelay = 4f;  // maximum delay between spawns
 
-    private GameObject[] activeCustomers;
+    private GameObject[] activeCustomers; // array to track current active customers
 
     private void Start()
     {
-        activeCustomers = new GameObject[spawnPoints.Length];
+        activeCustomers = new GameObject[spawnPoints.Length]; // initialize array
 
-        // spawn initial customers with delays
+        // spawn initial customers with a small random delay
         StartCoroutine(SpawnInitialCustomers());
     }
 
@@ -26,36 +26,37 @@ public class CustomerManager : MonoBehaviour
     {
         for (int i = 0; i < maxCustomers; i++)
         {
-            float delay = Random.Range(minSpawnDelay, maxSpawnDelay);
-            yield return new WaitForSeconds(delay);
-            SpawnCustomerAt(i);
+            float delay = Random.Range(minSpawnDelay, maxSpawnDelay); // random delay
+            yield return new WaitForSeconds(delay); // wait before spawning
+            SpawnCustomerAt(i); // spawn customer at index
         }
     }
 
     private void SpawnCustomerAt(int index)
     {
-        if (activeCustomers[index] == null)
+        if (activeCustomers[index] == null) // only spawn if slot is empty
         {
+            // instantiate customer prefab at spawn point, parented to manager
             GameObject newCustomer = Instantiate(customerPrefab, spawnPoints[index].position, Quaternion.identity, transform);
-            newCustomer.transform.localScale = Vector3.one; // keep scale correct
-            activeCustomers[index] = newCustomer;
+            newCustomer.transform.localScale = Vector3.one; // ensure correct scale
+            activeCustomers[index] = newCustomer; // store in active customers array
 
-            // customer script reference to handle leaving
+            // get customer script and links to onCustomerLeave event
             Customer custScript = newCustomer.GetComponent<Customer>();
-            custScript.onCustomerLeave += () => HandleCustomerLeave(index);
+            custScript.onCustomerLeave += () => HandleCustomerLeave(index); // handle leaving
         }
     }
 
     private void HandleCustomerLeave(int index)
     {
-        activeCustomers[index] = null;
-        StartCoroutine(RespawnCustomerAfterDelay(index));
+        activeCustomers[index] = null; // mark slot as empty
+        StartCoroutine(RespawnCustomerAfterDelay(index)); // respawn after delay
     }
 
     private IEnumerator RespawnCustomerAfterDelay(int index)
     {
-        float delay = Random.Range(minSpawnDelay, maxSpawnDelay);
-        yield return new WaitForSeconds(delay);
-        SpawnCustomerAt(index);
+        float delay = Random.Range(minSpawnDelay, maxSpawnDelay); // random respawn delay
+        yield return new WaitForSeconds(delay); // wait
+        SpawnCustomerAt(index); // respawn customer at index
     }
 }

@@ -25,28 +25,21 @@ public class OrderGenerator : MonoBehaviour
         {
             List<string> validIngredients = AlienDictionary.ItemIngredients[item];
             ingredient = validIngredients[Random.Range(0, validIngredients.Count)];
-
-            modifier = ""; // skips modifier for remove action
+            modifier = ""; // skips modifier for Remove
         }
-        else
+        else // Add verb
         {
-            modifier = GetRandomKey(AlienDictionary.ModifierDict);
             ingredient = GetRandomKey(AlienDictionary.IngredientDict);
+            modifier = GetRandomKey(AlienDictionary.ModifierDict); // modifier always applied on Add
         }
 
-        string englishOrder;
-
+        // Format order based on verb
         if (verb == "Remove")
-        {
-            englishOrder = $"{item} {verb} {ingredient}";
-        }
+            return $"{item} {verb} {ingredient}";
         else
-        {
-            englishOrder = $"{item} {verb} {modifier} {ingredient}";
-        }
-
-        return englishOrder;
+            return $"{item} {verb} {modifier} {ingredient}";
     }
+
 
     // generate the order, translate it, display it, and log it
     public void GenerateAndDisplayOrder()

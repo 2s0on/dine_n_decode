@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum FoodType
+public enum FoodType //enumeration for food item types
 {
     Ingredient, // e.g., Patty, Lettuce, Buns
     Modifier    // e.g., Spicy, Sweet, Salty

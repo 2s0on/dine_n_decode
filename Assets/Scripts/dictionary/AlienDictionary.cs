@@ -95,11 +95,4 @@ public static class AlienDictionary
         return string.Join(" ", translated); // joins all words with spaces to return a sentence
     }
 
-
-    //private static string Capitalize(string word) // capitalizes the first letter of the word 
-    //{
-    //    if (string.IsNullOrEmpty(word)) return word;
-    //    return char.ToUpper(word[0]) + word.Substring(1);
-    //}
-
 }

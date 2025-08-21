@@ -17,27 +17,35 @@ public class ServeZone : MonoBehaviour, IDropHandler
         {
             Debug.Log("Plate dropped in serve zone!");
 
-            // snap plate to zone visually
+            // snap plate visually to the serve zone WITHOUT reparenting to the customer
             RectTransform plateRect = draggedObj.GetComponent<RectTransform>();
-            plate.SetParentAndKeepScale(transform);
-            plateRect.anchoredPosition = Vector2.zero;
-            // prevents plate from scaling when parented to this zone
+            plateRect.position = transform.position + new Vector3(0, 50f, 0); // slight offset for feedback
+            plateRect.localScale = Vector3.one;
 
-            // disable dragging
-            Draggable dragScript = draggedObj.GetComponent<Draggable>();
-            if (dragScript != null) Destroy(dragScript);
-
-            // called for customer.cs to check plate
-            customer.Serve(plate);
-            CombineArea combineArea = FindObjectOfType<CombineArea>();
-            if (combineArea != null)
+            // make sure plate can still receive raycasts (interactable)
+            CanvasGroup cg = draggedObj.GetComponent<CanvasGroup>();
+            if (cg != null)
             {
-                combineArea.ResetCombineArea();
+                cg.blocksRaycasts = true;
+                cg.alpha = 1f;
             }
+
+            // check if the plate matches the customer's order
+            bool correct = customer.CheckPlate(plate.GetIngredients());
+
+            // call Serve to check the plate
+            customer.Serve(plate);
+
+            // reset plate back to original spot
+            plate.ResetPlate();
+
         }
         else
         {
             Debug.LogWarning("Dropped item is not a plate or customer missing!");
         }
     }
+
 }
+
+

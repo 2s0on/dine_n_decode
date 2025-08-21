@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class PanelOpener : MonoBehaviour
 {
-    public GameObject panelToOpen; // Assign your UI Panel here in the Inspector
+    public GameObject panelToOpen; // assign the panel GameObject in the inspector
 
     public void OpenPanel()
     {
         if (panelToOpen != null)
         {
-            panelToOpen.SetActive(true); // Activates the panel, making it visible
+            panelToOpen.SetActive(true); // activates the panel, making it visible
         }
     }
 
@@ -16,7 +16,7 @@ public class PanelOpener : MonoBehaviour
     {
         if (panelToOpen != null)
         {
-            panelToOpen.SetActive(false); // Deactivates the panel, hiding it
+            panelToOpen.SetActive(false); // deactivates the panel, hiding it
         }
     }
 
@@ -24,7 +24,7 @@ public class PanelOpener : MonoBehaviour
     {
         if (panelToOpen != null)
         {
-            panelToOpen.SetActive(!panelToOpen.activeSelf); // Toggles visibility
+            panelToOpen.SetActive(!panelToOpen.activeSelf); // toggles visibility
         }
     }
 }

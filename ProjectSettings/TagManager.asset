@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Plate
   - Ingredient
+  - DropArea
   layers:
   - Default
   - TransparentFX

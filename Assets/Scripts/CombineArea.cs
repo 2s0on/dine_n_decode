@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class CombineArea : MonoBehaviour, IDropHandler
 {
-    [Header("Plate Settings")]
-    public GameObject platePrefab;
-    public RectTransform plateSpawnPoint;
+    [Header("plate settings")]
+    public GameObject platePrefab; // prefab for new plate
+    public RectTransform plateSpawnPoint; // where new plate spawns
 
-    private GameObject currentPlateInArea;
+    private GameObject currentPlateInArea; // currently active plate in combine area
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -21,128 +20,71 @@ public class CombineArea : MonoBehaviour, IDropHandler
             if (currentPlateInArea != null)
             {
                 // snap plate to combine area
-                RectTransform plateRect = draggedObj.GetComponent<RectTransform>();
-                plateRect.anchoredPosition = Vector2.zero;
+                if (draggedObj.TryGetComponent<RectTransform>(out RectTransform plateRect))
+                {
+                    plateRect.SetParent(transform, false);
+                    plateRect.anchoredPosition = Vector2.zero; // center in combine area
+                }
 
-                // assign to currentPlateInArea BEFORE any reset/respawn
+                // assign current plate before any resets
                 currentPlateInArea = draggedObj;
             }
 
-
-            RectTransform droppedRect = draggedObj.GetComponent<RectTransform>();
-            droppedRect.SetParent(transform, false);
-            droppedRect.anchoredPosition = Vector2.zero; // snap plate to combine area
-
-
-            currentPlateInArea = draggedObj;
-            Debug.Log("Plate placed in combine area.");
+            currentPlateInArea = draggedObj; // store plate reference
+            Debug.Log("plate placed in combine area.");
             return;
         }
 
         // ingredient & modifier logic
-        FoodItem foodItem = draggedObj.GetComponent<FoodItem>();
-        if (foodItem == null) // checks for FoodItem script
+        if (!draggedObj.TryGetComponent<FoodItem>(out FoodItem foodItem))
         {
-            Debug.LogWarning("Dropped object has no FoodItem script!");
+            Debug.LogWarning("dropped object has no fooditem script!");
             return;
         }
 
-
-
-        if (currentPlateInArea == null) // checks if a plate exists in the combine area
+        if (currentPlateInArea == null) // require plate first
         {
-            Debug.LogWarning("You need a plate in the combine area before adding ingredients!");
+            Debug.LogWarning("you need a plate in the combine area before adding ingredients!");
             return;
         }
 
-        // add the ingredient/modifier to the plate
-        Plate plateScript = currentPlateInArea.GetComponent<Plate>();
-        if (plateScript != null)
+        // add ingredient/modifier to the current plate
+        if (currentPlateInArea.TryGetComponent<Plate>(out Plate plateScript))
         {
             plateScript.AddIngredient(foodItem.itemName);
         }
 
-        // snap ingredient onto plate
-        RectTransform ingredientRect = draggedObj.GetComponent<RectTransform>();
-        ingredientRect.SetParent(currentPlateInArea.transform, false);
-        ingredientRect.anchoredPosition = Vector2.zero;
+        // snap ingredient visually onto plate
+        if (draggedObj.TryGetComponent<RectTransform>(out RectTransform ingredientRect))
+        {
+            ingredientRect.SetParent(currentPlateInArea.transform, false);
+            ingredientRect.anchoredPosition = Vector2.zero;
+        }
 
         Debug.Log($"{foodItem.itemName} placed on plate.");
 
-
-        // resets the draggable in original spot
-        Draggable draggable = draggedObj.GetComponent<Draggable>();
-        if (draggable != null && draggable.originalParent != null)
+        // reset draggable back to original spot
+        if (draggedObj.TryGetComponent<Draggable>(out Draggable draggable) && draggable.originalParent != null)
         {
-            // instantiate a new ingredient at the original position
+            // instantiate a new ingredient at original parent
             GameObject newIngredient = Instantiate(draggedObj.gameObject, draggable.originalParent);
-            RectTransform newRect = newIngredient.GetComponent<RectTransform>();
-            newRect.anchoredPosition = draggable.originalPosition;
-
-            // reset the draggable component (ensures that it can be dragged again)
-            Draggable newDraggable = newIngredient.GetComponent<Draggable>();
-            newDraggable.originalParent = draggable.originalParent;
-            newDraggable.originalPosition = draggable.originalPosition;
-
-            // reset the canvas group properties ensuring it can be interacted with
-            CanvasGroup cg = newIngredient.GetComponent<CanvasGroup>();
-            if (cg != null)
+            if (newIngredient.TryGetComponent<RectTransform>(out RectTransform newRect))
             {
-                cg.alpha = 1f;
-                cg.blocksRaycasts = true;
+                newRect.anchoredPosition = draggable.originalPosition; // snap to original
+            }
 
+            if (newIngredient.TryGetComponent<Draggable>(out Draggable newDraggable))
+            {
+                newDraggable.originalParent = draggable.originalParent; // keep original parent
+                newDraggable.originalPosition = draggable.originalPosition; // keep original pos
+            }
+
+            if (newIngredient.TryGetComponent<CanvasGroup>(out CanvasGroup cg))
+            {
+                cg.alpha = 1f; // reset alpha
+                cg.blocksRaycasts = true; // enable raycasts
             }
         }
-    }
-
-    // resets the combine area and respawns all items after a plate is served
-    public void ResetCombineArea()
-    {
-        if (currentPlateInArea != null)
-        {
-            Plate plateComp = currentPlateInArea.GetComponent<Plate>();
-            RectTransform plateRect = currentPlateInArea.GetComponent<RectTransform>();
-            if (plateRect != null && plateComp != null)
-            {
-                // move plate back to spawn point
-                plateRect.SetParent(plateSpawnPoint, false);
-                plateRect.anchoredPosition = Vector2.zero;
-
-                // force scale
-                plateRect.localScale = plateComp.transform.localScale;
-            }
-
-            // Reset draggable info
-            Draggable plateDrag = currentPlateInArea.GetComponent<Draggable>();
-            if (plateDrag != null)
-            {
-                plateDrag.originalParent = plateSpawnPoint;
-                plateDrag.originalPosition = Vector2.zero;
-            }
-        }
-
-        // Reset all ingredients/modifiers
-        Draggable[] allDraggables = FindObjectsOfType<Draggable>();
-        foreach (Draggable d in allDraggables)
-        {
-            if (d.CompareTag("Plate")) continue; // skip plate itself
-
-            RectTransform rect = d.GetComponent<RectTransform>();
-            rect.SetParent(d.originalParent, false);
-            rect.anchoredPosition = d.originalPosition;
-            rect.localScale = Vector3.one;
-
-            CanvasGroup cg = d.GetComponent<CanvasGroup>();
-            if (cg != null)
-            {
-                cg.alpha = 1f;
-                cg.blocksRaycasts = true;
-            }
-        }
-
-        // clear reference so a new plate can be used
-        currentPlateInArea = null;
     }
 
 }
-
